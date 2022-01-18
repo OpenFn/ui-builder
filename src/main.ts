@@ -1,11 +1,13 @@
+import "./main.css";
 import App from './App.svelte'
-import 'tailwindcss/tailwind.css'
 
+
+const code: string = `
+if (true) { alert("hello"); }
+`
 const app = new App({
   target: document.body,
-  props: {
-    name: 'world'
-  }
+  props: { code }
 })
 
 export default app
