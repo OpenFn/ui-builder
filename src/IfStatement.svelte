@@ -1,10 +1,13 @@
 <script lang="ts">
   import type ts from 'typescript'
   import { getChildren, printNode } from './parser'
+	import { replaceText } from './sourceFileStore';
   import Node from './Node.svelte'
 
   export let node: ts.IfStatement
-  let expressionText = printNode(node.expression)
+  $: expressionText = printNode(node.expression)
+	$: expressionStart = node.expression.getStart()
+	$: expressionEnd = node.expression.getEnd()
 </script>
 
 <div class="rounded bg-white border-solid border-2 border-blue">
@@ -23,7 +26,7 @@
                border-transparent
                focus:border-gray-500 focus:bg-white focus:ring-0"
         placeholder=""
-        bind:value={expressionText} />
+        value={expressionText} on:change={() => replaceText(expressionStart, expressionEnd, expressionText)} />
     </label>
     <Node node={node.expression} />
     {#each [...getChildren(node)] as node}
