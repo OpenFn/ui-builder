@@ -49,7 +49,7 @@ const options = {
   bundle: true,
   watch,
   format: 'iife',
-  target: 'es6',
+  target: 'es2020',
   minify: production,
   sourcemap: false,
   outfile: './public/build/bundle.js', // and bundle.css

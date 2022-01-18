@@ -1,18 +1,5 @@
 import * as ts from 'typescript'
 
-const code = "if(true){alert('foo')}"
-
-const sourceFile = ts.createSourceFile('temp.ts', code, 8)
-let indent = 0
-
-function printTree(node: ts.Node) {
-  console.log(new Array(indent + 1).join(' ') + ts.SyntaxKind[node.kind])
-  indent++
-  ts.forEachChild(node, printTree)
-  indent--
-}
-printTree(sourceFile)
-
 /**
  * Generates a nested data structure representing parent and their child nodes
  * for a given node/ast.

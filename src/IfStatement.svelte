@@ -4,7 +4,6 @@
   import Node from './Node.svelte'
 
   export let node: ts.IfStatement
-	debugger;
   let expressionText = printNode(node.expression)
 </script>
 
