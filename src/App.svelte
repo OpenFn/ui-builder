@@ -8,6 +8,8 @@
 	let codeString: string;
 
 	code.subscribe(value => {
+		console.log("code subscription");
+		
 		codeString = value;
 		node = stringToSourceFile(codeString);
 	});
