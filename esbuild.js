@@ -1,10 +1,10 @@
-const esbuild = require('esbuild')
-const sveltePreprocess = require('svelte-preprocess')
-const sveltePlugin = require('esbuild-svelte') // esbuild plugin svelte
-const autoprefixer = require('autoprefixer')
-const postcss = require('esbuild-postcss')
-const tailwindcss = require('tailwindcss')
-const liveServer = require('live-server') // dev server
+import { build as _build } from 'esbuild'
+import sveltePreprocess from 'svelte-preprocess'
+import sveltePlugin from 'esbuild-svelte' // esbuild plugin svelte
+import autoprefixer from 'autoprefixer'
+import postcss from 'esbuild-postcss'
+import tailwindcss from 'tailwindcss'
+import liveserver from 'live-server' // dev server
 
 function showUsage() {
   console.log('USAGE')
@@ -34,7 +34,7 @@ if (process.argv[2] === 'watch') {
       else console.log('esbuild: Watch build succeeded')
     }
   }
-  liveServer.start({
+  liveserver.start({
     port: 8080, // Set the server port. Defaults to 8080.
     root: './public', // Set root directory that's being served. Defaults to cwd.
     open: false, // When false, it won't load your browser by default.
@@ -45,21 +45,31 @@ if (process.argv[2] === 'watch') {
 
 // esbuild build options, see: https://esbuild.github.io/api/#build-api
 const options = {
-  entryPoints: ['./src/main.ts'],
+  entryPoints: {
+    main: './src/main.ts',
+    tsworker: 'monaco-editor/esm/vs/language/typescript/ts.worker'
+  },
   bundle: true,
+  write: true,
   watch,
   format: 'iife',
   target: 'es2020',
   minify: production,
   sourcemap: false,
-  outfile: './public/build/bundle.js', // and bundle.css
+  // outfile: './public/build/bundle.js', // and bundle.css
+  outdir: './public/build',
   pure: production ? ['console.log', 'console.time', 'console.timeEnd'] : [],
   legalComments: 'none',
-  plugins: [sveltePlugin({ preprocess: sveltePreprocess() }), postcss()]
+  plugins: [
+    // workerPlugin(), metaUrlPlugin(),
+    sveltePlugin({ preprocess: sveltePreprocess() }),
+    postcss()
+  ],
+  loader: { '.ttf': 'file' }
 }
 
 // esbuild dev + prod
-esbuild.build(options).catch((err) => {
+_build(options).catch((err) => {
   console.error(err)
   process.exit(1)
 })

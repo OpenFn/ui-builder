@@ -6,6 +6,7 @@
     "lint": "svelte-check --tsconfig ./tsconfig.json && prettier --plugin-search-dir=. --write .",
     "build": "node esbuild prod"
   },
+  "type": "module",
   "devDependencies": {
     "@tailwindcss/forms": "^0.4.0",
     "@tsconfig/svelte": "^2.0.1",
@@ -14,6 +15,7 @@
     "esbuild-postcss": "^0.0.4",
     "esbuild-svelte": "^0.5.6",
     "live-server": "^1.2.1",
+    "monaco-editor": "^0.31.1",
     "postcss": "^8.4.5",
     "prettier": "^2.4.1",
     "prettier-plugin-svelte": "^2.4.0",

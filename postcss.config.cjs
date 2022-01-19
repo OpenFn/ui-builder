@@ -5,6 +5,6 @@ module.exports = (ctx) => ({
   },
   plugins: {
     autoprefixer: {},
-    tailwindcss: { config: './tailwind.config.js' }
+    tailwindcss: { config: './tailwind.config.cjs' }
   }
 })
