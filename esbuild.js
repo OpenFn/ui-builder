@@ -1,9 +1,7 @@
 import { build as _build } from 'esbuild'
 import sveltePreprocess from 'svelte-preprocess'
 import sveltePlugin from 'esbuild-svelte' // esbuild plugin svelte
-import autoprefixer from 'autoprefixer'
 import postcss from 'esbuild-postcss'
-import tailwindcss from 'tailwindcss'
 import liveserver from 'live-server' // dev server
 
 function showUsage() {
@@ -62,7 +60,7 @@ const options = {
   legalComments: 'none',
   plugins: [
     // workerPlugin(), metaUrlPlugin(),
-    sveltePlugin({ preprocess: sveltePreprocess() }),
+    sveltePlugin({ preprocess: sveltePreprocess(), compileOptions: { dev: true } }),
     postcss()
   ],
   loader: { '.ttf': 'file' }

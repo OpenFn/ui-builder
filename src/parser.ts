@@ -18,7 +18,7 @@ export function generateTree(node: ts.Node, acc: string[][] = []) {
   return acc
 }
 
-export function stringToSourceFile(code: string): ts.Node {
+export function stringToSourceFile(code: string): ts.SourceFile {
   // ES2020 being the script target
   // true being to `setParentNodes` important for rendering
   // the text of a node (where the printer need the SourceFile for context)

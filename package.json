@@ -1,6 +1,6 @@
 {
-  "name": "svelte-typescript-esbuild-tailwind-template",
-  "version": "1.0.0",
+  "name": "@openfn/ui-builder",
+  "version": "0.0.1-alpha",
   "scripts": {
     "dev": "node esbuild watch",
     "lint": "svelte-check --tsconfig ./tsconfig.json && prettier --plugin-search-dir=. --write .",
