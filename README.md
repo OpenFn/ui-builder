@@ -1,6 +1,6 @@
 # UI Builder
 
-![Version](https://img.shields.io/github/package-json/v/openfn/language-common?style=for-the-badge)
+![Version](https://img.shields.io/github/package-json/v/openfn/ui-builder?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Svelte](https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00)
 
