@@ -45,13 +45,14 @@ if (process.argv[2] === 'watch') {
 const options = {
   entryPoints: {
     main: './src/main.ts',
-    tsworker: 'monaco-editor/esm/vs/language/typescript/ts.worker'
+    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+    'monaco-editor': 'monaco-editor'
   },
   bundle: true,
   write: true,
   watch,
-  format: 'iife',
-  target: 'es2020',
+  format: 'esm',
+  target: 'esnext',
   minify: production,
   sourcemap: false,
   // outfile: './public/build/bundle.js', // and bundle.css

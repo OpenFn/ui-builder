@@ -4,12 +4,13 @@ export function createEditor(
   elem: HTMLElement,
   opts: monaco.editor.IStandaloneEditorConstructionOptions
 ): monaco.editor.IStandaloneCodeEditor {
-  this.MonacoEnvironment = {
+  self.MonacoEnvironment = {
     getWorkerUrl() {
       // TODO: this shouldn't be so static...
       // see: https://github.com/microsoft/monaco-editor/tree/main/samples/browser-esm-esbuild
       // for inspiration
-      return './build/tsworker.js'
+      // return './build/tsworker.js'
+      return new URL('ts.worker.js', import.meta.url)
     }
   }
 
