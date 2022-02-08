@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type ts from "typescript";
   import { code, sourceFile, sourceFileText } from "./sourceFileStore";
   import Node from "./Node.svelte";
   import Editor from "./Editor.svelte";

@@ -1,23 +1,27 @@
 <script lang="ts">
   import { getChildren, getType } from './parser'
-  import ts, { SyntaxKind } from 'typescript'
+  import { SyntaxKind } from 'typescript'
+  import type ts from 'typescript'
 
-  export let node: ts.Node
-
-  let kind = node.kind
-  let nodeType: string = SyntaxKind[node.kind]
-  $: {
-    console.log(node.kind, kind, nodeType)
-  }
-  let shouldRender = nodeType != 'EndOfFileToken'
   import SourceFile from './SourceFile.svelte'
   import IfStatement from './IfStatement.svelte'
 
   const nodeComponents = { SourceFile, IfStatement }
+
+  export let node: ts.Node
+
+  $: kind = node.kind
+  $: nodeType = SyntaxKind[node.kind]
+  $: shouldRender = nodeType != 'EndOfFileToken'
+
+  $: {
+    console.log(nodeType, kind, nodeType, shouldRender)
+  }
 </script>
 
 {#if shouldRender}
   {#if nodeType in nodeComponents}
+    {(console.log(nodeComponents[nodeType]), '')}
     <svelte:component this={nodeComponents[nodeType]} {node} />
   {:else}
     <div class="rounded p-2 bg-blue-500/25">
@@ -26,7 +30,15 @@
           {nodeType}
         </div>
         <div
-          class="px-2 flex-none text-xs rounded-lg flex items-center justify-center text-neutral-800 hover:bg-slate-300/50">
+          class="px-2
+                 flex-none
+                 text-xs
+                 rounded-lg
+                 flex
+                 items-center
+                 justify-center
+                 text-neutral-800
+                 hover:bg-slate-300/50">
           {node.getStart()}:{node.getEnd()}
         </div>
       </div>
