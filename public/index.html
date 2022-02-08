@@ -12,8 +12,13 @@
 	<script charset="utf-8" type="module">
 		import('/build/main.js')
 			.then(({Builder}) => {
-				Builder(document.getElementById("editor"));
-			});
+				Builder(document.getElementById("editor"),
+				`if (true) {
+					alert('foo')
+				 } else {
+				 	throw new Error("bar")
+				 }`
+			)});
 	</script>
 </body>
 </html>
