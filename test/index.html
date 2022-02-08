@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Svelte app</title>
+	<link rel="icon" type="image/png" href="/favicon.png">
+	<link rel="stylesheet" href="/public/build/main.css">
+</head>
+<body>
+	<div id="editor" style="max-height: 80vh"></div>
+	<script charset="utf-8" type="module">
+		import('/public/build/main.js')
+			.then(({Builder}) => {
+				Builder(document.getElementById("editor"));
+			});
+	</script>
+</body>
+</html>
