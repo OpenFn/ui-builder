@@ -1,16 +1,34 @@
 import * as monaco from 'monaco-editor'
 
+/**
+ * Creates a new MonacoEditor.
+ *
+ * This is where the webworker modules are loaded. ESM modules are used, and
+ * have their own entrypoints in the build configuration: see `esbuild.js` for
+ * the mappings between `*.worker.js` and the modules from Monaco.
+ */
 export function createEditor(
   elem: HTMLElement,
   opts: monaco.editor.IStandaloneEditorConstructionOptions
 ): monaco.editor.IStandaloneCodeEditor {
   self.MonacoEnvironment = {
-    getWorkerUrl() {
-      // TODO: this shouldn't be so static...
-      // see: https://github.com/microsoft/monaco-editor/tree/main/samples/browser-esm-esbuild
-      // for inspiration
-      // return './build/tsworker.js'
-      return new URL('ts.worker.js', import.meta.url)
+    getWorker(_workerId: string, label: string): Worker {
+      switch (label) {
+        case 'typescript':
+        case 'javascript':
+          return new Worker(new URL('ts.worker.js', import.meta.url), {
+            name: 'ts.worker',
+            type: 'module'
+          })
+
+        case 'editorWorkerService':
+          return new Worker(new URL('editor.worker.js', import.meta.url), {
+            name: 'editor.worker',
+            type: 'module'
+          })
+        default:
+          throw new Error(`MonacoEnvironment.getWorker requested an unsupported worker: ${label}`)
+      }
     }
   }
 

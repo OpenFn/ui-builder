@@ -46,6 +46,7 @@ const options = {
   entryPoints: {
     main: './src/main.ts',
     'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker',
     'monaco-editor': 'monaco-editor'
   },
   bundle: true,

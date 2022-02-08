@@ -3,7 +3,8 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
   "compilerOptions": {
-    "target": "es2020",
+    "target": "esnext",
+    "module": "esnext",
     "strict": true
   }
 }
