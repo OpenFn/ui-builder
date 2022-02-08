@@ -11,6 +11,26 @@ Javascript code.
 > This project is in it's infancy, and is in no way ready for production. 
 > If this is something that's interesting to you, please reach out!
 
+## Usage
+
+In your HTML, add an element to attach the component to, import the Builder
+module and call it with the mounting element and optionally some initial code.
+
+```
+<div id="editor" style="max-height: 80vh"></div>
+<script charset="utf-8" type="module">
+  import('/build/main.js')
+    .then(({Builder}) => {
+      Builder(document.getElementById("editor"),
+      `if (true) {
+        alert('foo')
+       } else {
+        throw new Error("bar")
+       }`
+    )});
+</script>
+```
+
 ## Getting started
 
 ```sh
