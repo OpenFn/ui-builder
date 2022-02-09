@@ -1,4 +1,4 @@
-import { build as _build } from 'esbuild'
+import { build } from 'esbuild'
 import sveltePreprocess from 'svelte-preprocess'
 import sveltePlugin from 'esbuild-svelte' // esbuild plugin svelte
 import postcss from 'esbuild-postcss'
@@ -41,35 +41,50 @@ if (process.argv[2] === 'watch') {
   })
 }
 
-// esbuild build options, see: https://esbuild.github.io/api/#build-api
-const options = {
-  entryPoints: {
-    main: './src/main.ts',
-    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
-    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker',
-    'monaco-editor': 'monaco-editor'
-  },
+const commonBuildOptions = {
   bundle: true,
   write: true,
   watch,
   format: 'esm',
   target: 'esnext',
   minify: production,
-  sourcemap: false,
-  // outfile: './public/build/bundle.js', // and bundle.css
   outdir: './public/build',
   pure: production ? ['console.log', 'console.time', 'console.timeEnd'] : [],
-  legalComments: 'none',
+  legalComments: 'none'
+}
+
+/**
+ * Component modules
+ */
+build({
+  ...commonBuildOptions,
+  entryPoints: {
+    main: './src/main.ts',
+    'monaco-editor': 'monaco-editor'
+  },
   plugins: [
-    // workerPlugin(), metaUrlPlugin(),
     sveltePlugin({ preprocess: sveltePreprocess(), compileOptions: { dev: true } }),
     postcss()
   ],
   loader: { '.ttf': 'file' }
-}
+}).catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
 
-// esbuild dev + prod
-_build(options).catch((err) => {
+/**
+ * WebWorker modules
+ * Need to be built using 'iife' since Firefox does not support ESM modules
+ * in Workers just yet.
+ */
+build({
+  ...commonBuildOptions,
+  entryPoints: {
+    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker'
+  },
+  format: 'iife'
+}).catch((err) => {
   console.error(err)
   process.exit(1)
 })
