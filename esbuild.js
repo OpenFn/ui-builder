@@ -47,10 +47,11 @@ const commonBuildOptions = {
   watch,
   format: 'esm',
   target: 'esnext',
-  minify: production,
   outdir: './public/build',
-  pure: production ? ['console.log', 'console.time', 'console.timeEnd'] : [],
-  legalComments: 'none'
+  legalComments: 'none',
+  ...(production
+    ? { outdir: './dist', minify: true, pure: ['console.log', 'console.time', 'console.timeEnd'] }
+    : {})
 }
 
 /**
