@@ -50,7 +50,7 @@ const commonBuildOptions = {
   outdir: './public/build',
   legalComments: 'none',
   ...(production
-    ? { outdir: './dist', minify: true, pure: ['console.log', 'console.time', 'console.timeEnd'] }
+    ? { outdir: './dist', pure: ['console.log', 'console.time', 'console.timeEnd'] }
     : {})
 }
 
@@ -78,14 +78,18 @@ build({
  * Need to be built using 'iife' since Firefox does not support ESM modules
  * in Workers just yet.
  */
-build({
+const workerBuildOptions = {
   ...commonBuildOptions,
   entryPoints: {
     'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
     'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker'
   },
-  format: 'iife'
-}).catch((err) => {
+  ...(production
+    ? { format: 'esm', outdir: commonBuildOptions.outdir + '/esm' }
+    : { format: 'iife' })
+}
+
+build(workerBuildOptions).catch((err) => {
   console.error(err)
   process.exit(1)
 })
