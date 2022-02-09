@@ -8,6 +8,7 @@
     "test": "JEST_PUPPETEER_CONFIG=jest-puppeteer.config.cjs jest test/test.js"
   },
   "type": "module",
+  "main": "dist/index.js",
   "devDependencies": {
     "@tailwindcss/forms": "^0.4.0",
     "@tsconfig/svelte": "^2.0.1",

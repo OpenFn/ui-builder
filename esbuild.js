@@ -60,7 +60,7 @@ const commonBuildOptions = {
 build({
   ...commonBuildOptions,
   entryPoints: {
-    main: './src/main.ts',
+    index: './src/index.ts',
     'monaco-editor': 'monaco-editor'
   },
   plugins: [

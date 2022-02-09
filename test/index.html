@@ -10,7 +10,7 @@
 <body>
 	<div id="editor" style="max-height: 80vh"></div>
 	<script charset="utf-8" type="module">
-		import('/public/build/main.js')
+		import('/public/build/index.js')
 			.then(({Builder}) => {
 				Builder(document.getElementById("editor"));
 			});
