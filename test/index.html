@@ -5,22 +5,15 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>Svelte app</title>
 	<link rel="icon" type="image/png" href="/favicon.png">
-	<link rel="stylesheet" href="/build/main.css">
+	<link rel="stylesheet" href="/public/build/main.css">
 </head>
 <body>
-	<div class="container mx-auto pt-4">
-		<div id="editor" style="max-height: 80vh"></div>
-	</div>
+	<div id="editor" style="max-height: 80vh"></div>
 	<script charset="utf-8" type="module">
-		import('/build/index.js')
+		import('/public/build/index.js')
 			.then(({Builder}) => {
-				Builder(document.getElementById("editor"),
-				`if (true) {
-					alert('foo')
-				 } else {
-				 	throw new Error("bar")
-				 }`
-			)});
+				Builder(document.getElementById("editor"));
+			});
 	</script>
 </body>
 </html>

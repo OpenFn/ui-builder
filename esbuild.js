@@ -1,4 +1,4 @@
-import { build as _build } from 'esbuild'
+import { build } from 'esbuild'
 import sveltePreprocess from 'svelte-preprocess'
 import sveltePlugin from 'esbuild-svelte' // esbuild plugin svelte
 import postcss from 'esbuild-postcss'
@@ -41,33 +41,55 @@ if (process.argv[2] === 'watch') {
   })
 }
 
-// esbuild build options, see: https://esbuild.github.io/api/#build-api
-const options = {
-  entryPoints: {
-    main: './src/main.ts',
-    tsworker: 'monaco-editor/esm/vs/language/typescript/ts.worker'
-  },
+const commonBuildOptions = {
   bundle: true,
   write: true,
   watch,
-  format: 'iife',
-  target: 'es2020',
-  minify: production,
-  sourcemap: false,
-  // outfile: './public/build/bundle.js', // and bundle.css
+  format: 'esm',
+  target: 'esnext',
   outdir: './public/build',
-  pure: production ? ['console.log', 'console.time', 'console.timeEnd'] : [],
   legalComments: 'none',
+  ...(production
+    ? { outdir: './dist', pure: ['console.log', 'console.time', 'console.timeEnd'] }
+    : {})
+}
+
+/**
+ * Component modules
+ */
+build({
+  ...commonBuildOptions,
+  entryPoints: {
+    index: './src/index.ts',
+    'monaco-editor': 'monaco-editor'
+  },
   plugins: [
-    // workerPlugin(), metaUrlPlugin(),
     sveltePlugin({ preprocess: sveltePreprocess(), compileOptions: { dev: true } }),
     postcss()
   ],
   loader: { '.ttf': 'file' }
+}).catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
+
+/**
+ * WebWorker modules
+ * Need to be built using 'iife' since Firefox does not support ESM modules
+ * in Workers just yet.
+ */
+const workerBuildOptions = {
+  ...commonBuildOptions,
+  entryPoints: {
+    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker'
+  },
+  ...(production
+    ? { format: 'esm', outdir: commonBuildOptions.outdir + '/esm' }
+    : { format: 'iife' })
 }
 
-// esbuild dev + prod
-_build(options).catch((err) => {
+build(workerBuildOptions).catch((err) => {
   console.error(err)
   process.exit(1)
 })
