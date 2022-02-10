@@ -1,33 +1,59 @@
-import { writable, derived, get, Readable } from 'svelte/store'
-import { stringToSourceFile } from './parser'
+import { writable, derived, get, Readable, readable } from 'svelte/store'
+import { stringToCompiler, stringToSourceFile } from './parser'
 import type ts from 'typescript'
+import { assembleCompiler, BaseCompiler } from './compiler'
+
+export type State = {
+  ready: boolean
+  compiler: BaseCompiler | null
+}
+
+function initialState(): State {
+  return {
+    ready: false,
+    compiler: null
+  }
+}
+function unsubscribe() {
+  // nothing to do here yet..
+}
+
+async function initializeCompiler(state: State, code: string, set) {
+  const compiler = await assembleCompiler(code)
+  state.compiler = compiler
+  state.ready = true
+  set(state)
+}
+
+export function createCompilerStore(initialCode: string): Readable<State> {
+  let initial = initialState()
+  let store = readable(initial, (set) => {
+    initializeCompiler(initial, initialCode, set)
+    return unsubscribe
+  })
+
+  return store
+}
 
 export const code = writable('')
-export const sourceFile = derived(code, ($code): ts.SourceFile => {
-  // TODO figure out if it's possible to update the SourceFile instead of replacing it
-  // currently getting errors from .update when an expression has spaces in it
-  // const prev: ts.SourceFile | null = get(sourceFile)
+export const compiler = derived(code, async ($code, set): void => {
+  const compiler = await assembleCompiler($code)
 
-  // if (prev) {
-  //   try {
-  //     prev.update($code, {
-  //       newLength: $code.length,
-  //       span: {
-  //         start: 0,
-  //         length: prev.text.length
-  //       }
-  //     })
-  //   } catch (error) {
-  //     console.warn('Updating SourceFile failed with:', error)
-
-  //     return prev
-  //   }
-  //   return prev
-  // }
-  return stringToSourceFile($code)
+  console.debug(compiler.getDiagnostics())
+  set(compiler)
 })
 
-export const sourceFileText = derived(sourceFile, ($sourceFile) => $sourceFile.text)
+export const sourceFile = derived(compiler, ($compiler): ts.SourceFile => {
+  if ($compiler) {
+    const sourceFile = $compiler.program.getSourceFile('index.ts')
+    console.log(sourceFile)
+    return sourceFile
+  }
+})
+
+export const sourceFileText = derived(sourceFile, ($sourceFile) => {
+  return $sourceFile?.text
+})
 
 export function replaceNodeText(node, content: string) {
   return code.update((codeString: string) => {

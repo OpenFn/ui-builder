@@ -11,8 +11,9 @@
   let mustTriggerChange = true
 
   $: {
-    console.log(code)
+    console.log(code, editorElement)
   }
+
   onMount(() => {
     editor = createEditor(editorElement, {
       value: code,

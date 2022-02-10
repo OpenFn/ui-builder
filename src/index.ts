@@ -1,13 +1,11 @@
 import './main.css'
 // rename to a 'component'.
 import App from './App.svelte'
-import { code } from './sourceFileStore';
+import { code, createCompilerStore } from './sourceFileStore';
 
 export function Builder(elem: HTMLElement, initialCode: string): App {
-  if (initialCode) {
-    code.update(() => initialCode);
-  }
+  const compilerStore = createCompilerStore(initialCode);
 
-  const app = new App({ target: elem })
+  const app = new App({ target: elem, props: { compilerStore }})
   return app
 }

@@ -1,4 +1,5 @@
 import * as ts from 'typescript'
+import { BaseCompiler } from './compiler';
 
 /**
  * Generates a nested data structure representing parent and their child nodes
@@ -24,6 +25,16 @@ export function stringToSourceFile(code: string): ts.SourceFile {
   // the text of a node (where the printer need the SourceFile for context)
   return ts.createSourceFile('temp.ts', code, ts.ScriptTarget.ES2020, true, ts.ScriptKind.JS)
 }
+
+export function stringToCompiler(code: string): ts.SourceFile {
+  const compiler: BaseCompiler = new BaseCompiler();
+  compiler.env.createFile("index.ts", code);
+
+  const sourceFile = compiler.program.getSourceFile("index.ts");
+  console.log(sourceFile);
+  return sourceFile;
+}
+
 
 export function getType(node: ts.Node): string {
   return ts.SyntaxKind[node.kind]

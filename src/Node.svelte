@@ -8,7 +8,7 @@
 
   const nodeComponents = { SourceFile, IfStatement }
 
-  export let node: ts.Node
+  export let node: ts.Node | undefined
 
   $: kind = node.kind
   $: nodeType = SyntaxKind[node.kind]
