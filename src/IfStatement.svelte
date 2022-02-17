@@ -1,6 +1,7 @@
 <script lang="ts">
   import type ts from 'typescript'
   import { replaceNodeText } from './sourceFileStore'
+  import { getNodeRange } from './parser'
   import Node from './Node.svelte'
   /* import { isLabeledStatement } from 'typescript' */
 
@@ -9,6 +10,14 @@
   $: expressionText = expression.getFullText()
   $: expressionStart = expression.getStart()
   $: expressionEnd = expression.getFullWidth()
+
+  function changeNode(model, node, text) {
+    model.pushEditOperations([], [{ range: getNodeRange(node), text }])
+  }
+
+  $: {
+    console.log(getNodeRange(node.expression))
+  }
 </script>
 
 <div class="rounded bg-white border-solid border-2 border-blue">
@@ -28,7 +37,7 @@
                focus:border-gray-500 focus:bg-white focus:ring-0"
         placeholder=""
         value={expressionText}
-        on:input={(e) => replaceNodeText(expression, e.target.value)} />
+        on:input={(e) => changeNode(window.editor.getModel(), expression, e.target.value)} />
     </div>
     {#if node.thenStatement}
       <div class="block">

@@ -14,6 +14,7 @@
     console.log(code)
   }
   onMount(() => {
+    console.log('mounting editor')
     editor = createEditor(editorElement, {
       value: code,
       language: 'javascript',
@@ -30,6 +31,8 @@
     // import languageCommonDts from '../public/build/types/index.d.ts'
     // addExtraLib(languageCommonDts, 'ts:language-common/index.d.ts')
 
+    window.editor = editor
+
     editor.onDidChangeModelContent((event) => {
       if (mustTriggerChange) {
         editor && onChange(editor.getValue(), event)
@@ -38,13 +41,12 @@
   })
 
   $: {
-    mustTriggerChange = false
-    if (editor) {
-      console.log('replacing editor value', code)
-
-      replaceEditorValue(editor, code)
-    }
-    mustTriggerChange = true
+    /* mustTriggerChange = false */
+    /* if (editor) { */
+    /*   console.log('replacing editor value', code) */
+    /*   replaceEditorValue(editor, code) */
+    /* } */
+    /* mustTriggerChange = true */
   }
 </script>
 

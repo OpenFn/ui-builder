@@ -3,7 +3,7 @@
   import Node from './Node.svelte'
   import Editor from './Editor.svelte'
 
-  let editorChange = function (value, event) {
+  let editorChange = function (_value, event) {
     code.update((current: string) => {
       return event.changes.reduce((acc: string, change) => {
         // TODO: move this to helper module

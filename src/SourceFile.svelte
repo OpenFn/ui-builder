@@ -1,8 +1,8 @@
 <script>
-  export let node;
+  import { getChildren } from './parser'
+  import Node from './Node.svelte'
 
-  import { getChildren, getType } from "./parser";
-  import Node from "./Node.svelte";
+  export let node
 </script>
 
 <div class="rounded bg-white border-dashed border-2 border-blue">

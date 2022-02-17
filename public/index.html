@@ -15,11 +15,13 @@
 		import('/build/index.js')
 			.then(({Builder}) => {
 				Builder(document.getElementById("editor"),
-				`if (true) {
-					alert('foo')
-				 } else {
-				 	throw new Error("bar")
-				 }`
+				[
+					'if (true) {',
+					' alert("foo")',
+					'} else {',
+					'	throw new Error("bar")',
+					'}',
+				].join("\n")
 			)});
 	</script>
 </body>
