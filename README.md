@@ -31,6 +31,22 @@ module and call it with the mounting element and optionally some initial code.
 </script>
 ```
 
+### Add .d.ts files
+
+> ⛔ _This is internal currently_
+
+In the [`Editor`](src/Editor.svelte) component, .d.ts files can be added to the 
+editor directly using the `addExtraLib` from `editorSetup`.
+
+The type definitions will not be available in the Block Builder pane when done
+this way.
+
+> **NOTE** In order to emulate globally available functions (like with OpenFn
+> jobs), the `.d.ts` must not have any exports on the functions.  
+> A strategy for either flattening type definitions or working with a module
+> that has multiple type definition files (despite only one used entrypoint) 
+> hasn't been considered yet.
+
 ## Deployment
 
 Deploying libraries that use WebWorkers can be difficult, however when using

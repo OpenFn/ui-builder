@@ -2,7 +2,7 @@
   // import { create } from 'monaco-editor/esm/vs/language/typescript/ts.worker'
   import type monaco from 'monaco-editor'
   import { onMount } from 'svelte'
-  import { createEditor, replaceEditorValue } from './editorSetup'
+  import { createEditor, addExtraLib, replaceEditorValue } from './editorSetup'
 
   export let code: string
   export let onChange: (value: string, event: monaco.editor.IModelContentChangedEvent) => void
@@ -25,6 +25,10 @@
       theme: 'vs-dark',
       minimap: { enabled: false }
     })
+
+    // Example on adding a language pack's dts */
+    // import languageCommonDts from '../public/build/types/index.d.ts'
+    // addExtraLib(languageCommonDts, 'ts:language-common/index.d.ts')
 
     editor.onDidChangeModelContent((event) => {
       if (mustTriggerChange) {
