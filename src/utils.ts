@@ -5,8 +5,9 @@
  * should be library/use case agnostic.
  */
 
+import { getLineAndCharacterOfPosition } from 'typescript'
 import type ts from 'typescript'
-import type { IRange, ITextModel } from 'monaco-editor'
+import type { IRange, editor } from 'monaco-editor'
 
 /**
  * Gets an IRange of a given Node, which can be used when sending edit operations
@@ -16,8 +17,8 @@ import type { IRange, ITextModel } from 'monaco-editor'
  * are ignored.
  */
 export function getNodeRange(node: ts.Node): IRange {
-  const start = ts.getLineAndCharacterOfPosition(node.getSourceFile(), node.getStart())
-  const end = ts.getLineAndCharacterOfPosition(node.getSourceFile(), node.getEnd())
+  const start = getLineAndCharacterOfPosition(node.getSourceFile(), node.getStart())
+  const end = getLineAndCharacterOfPosition(node.getSourceFile(), node.getEnd())
 
   return {
     startLineNumber: start.line + 1,
@@ -30,7 +31,30 @@ export function getNodeRange(node: ts.Node): IRange {
 /**
  * Replaces a section of the editor code using an AST node's postion.
  * The Node passed in should come from an AST that came from the same model code.
+ * 
+ * This is the preferred way of changing the editor code as it maintains the
+ * undo/redo stack.
  */
-export function replaceNode(model: ITextModel, node: ts.Node, text: string): void {
+export function replaceNode(model: editor.ITextModel, node: ts.Node, text: string): void {
+  // @ts-expect-error
   model.pushEditOperations([], [{ range: getNodeRange(node), text }])
+}
+
+export function replaceEditorValue(editor: editor.IStandaloneCodeEditor, value: string) {
+  const model = editor.getModel()
+  if (value != null && model != null && value !== model.getValue()) {
+    editor.pushUndoStop()
+    // pushEditOperations says it expects a cursorComputer, but doesn't seem to need one.
+    // @ts-expect-error
+    model.pushEditOperations(
+      [],
+      [
+        {
+          range: model.getFullModelRange(),
+          text: value
+        }
+      ]
+    )
+    editor.pushUndoStop()
+  }
 }

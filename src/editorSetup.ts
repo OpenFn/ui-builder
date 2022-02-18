@@ -1,5 +1,7 @@
 import * as monaco from 'monaco-editor'
+import type { EditorFactory } from "./types"
 import languageCommonDts from '../public/build/types/index.d.ts'
+
 
 /**
  * Creates a new MonacoEditor.
@@ -8,10 +10,7 @@ import languageCommonDts from '../public/build/types/index.d.ts'
  * have their own entrypoints in the build configuration: see `esbuild.js` for
  * the mappings between `*.worker.js` and the modules from Monaco.
  */
-export function createEditor(
-  elem: HTMLElement,
-  opts: monaco.editor.IStandaloneEditorConstructionOptions
-): monaco.editor.IStandaloneCodeEditor {
+export const createEditor: EditorFactory = (elem, opts) => {
   self.MonacoEnvironment = {
     getWorker(_workerId: string, label: string): Worker {
       switch (label) {
