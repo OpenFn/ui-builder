@@ -19,6 +19,8 @@ export function Builder(elem: HTMLElement, initialCode: string): Layout {
     }
   })
 
+	window.editorContext = editorContext;
+
   let astContext = createAstContext({
     code: editorContext.editorValue,
     replaceNode: editorContext.replaceNode

@@ -26,7 +26,12 @@
     {(console.log(nodeComponents[nodeType]), '')}
     <svelte:component this={nodeComponents[nodeType]} {node} />
   {:else}
-    <div class="rounded p-2 bg-blue-500/25">
+    <div
+      class="rounded p-2 bg-blue-500/25"
+      on:mouseenter={(e) => {
+        window.editorContext.highlight(node)
+        e.stopPropagation()
+      }}>
       <div class="flex gap-2 text-sm font-mono leading-6 bg-stripes-indigo rounded-lg">
         <div class="grow flex">
           {nodeType}

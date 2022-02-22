@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  /* Box sizing for Monaco margin highlighting which needs an !important */
+  .inline-highlight {
+    width: 0.45rem !important;
+    margin-left: 3px;
+  }
+}

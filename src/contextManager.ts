@@ -10,7 +10,7 @@ import type ts from 'typescript'
 import type { AstContext, AstContextOptions, EditorContext, EditorContextOptions } from './types'
 import { debug } from 'svelte/internal'
 import { stringToSourceFile } from './parser'
-import { replaceNode, replaceEditorValue } from './utils'
+import { replaceNode, replaceEditorValue, getNodeRange } from './utils'
 
 interface CodeStore extends Readable<string> {
   set(this: void, value: string): void
@@ -56,11 +56,11 @@ export function createContext(options: ContextOptions) {
  */
 export function createEditorContext(opts: EditorContextOptions): EditorContext {
   const editor = writable<monaco.editor.IStandaloneCodeEditor | null>(null)
-  const editorValue: Writable<string> = writable("");
-  const elem: Writable<HTMLElement | null> = writable(opts.elem || null);
+  const editorValue: Writable<string> = writable('')
+  const elem: Writable<HTMLElement | null> = writable(opts.elem || null)
 
   function setElem(newElem: HTMLElement) {
-    console.debug("setting EditorContext.elem as", newElem)
+    console.debug('setting EditorContext.elem as', newElem)
     elem.set(newElem)
   }
 
@@ -68,27 +68,41 @@ export function createEditorContext(opts: EditorContextOptions): EditorContext {
     if ($elem) {
       const _editor = opts.editorFactory($elem, { ...opts.editorOptions, value: opts.code })
 
-      console.debug("setting onDidChangeModelContent callback")
+      console.debug('setting onDidChangeModelContent callback')
       _editor.onDidChangeModelContent((event) => {
-        console.debug("setting editorContent from onDidChangeModelContent")
+        console.debug('setting editorContent from onDidChangeModelContent')
         editorValue.set(_editor.getValue())
       })
 
       // Instead of waiting for a change in the editor, we set it immediately.
-      console.debug("setting EditorContext.editorValue with initial value from editor")
+      console.debug('setting EditorContext.editorValue with initial value from editor')
       editorValue.set(_editor.getValue())
       editor.set(_editor)
     }
   })
 
-  const model = derived(editor, ($editor) => {
-    if ($editor) {
-      console.debug("setting editorContent from derived model")
-      editorValue.set($editor.getValue())
-      return $editor.getModel()
-    }
-    return null
-  }, null as monaco.editor.ITextModel | null)
+  let oldDecorations: string[] = []
+  function highlight(node: ts.Node) {
+    console.debug('highlighting', getNodeRange(node))
+    oldDecorations = get(editor)?.deltaDecorations(oldDecorations, [
+      {
+        range: getNodeRange(node),
+        options: { isWholeLine: true, linesDecorationsClassName: 'bg-slate-400 inline-highlight' }
+      }
+    ])
+  }
+
+  const model = derived(
+    editor,
+    ($editor) => {
+      if ($editor) {
+        editorValue.set($editor.getValue())
+        return $editor.getModel()
+      }
+      return null
+    },
+    null as monaco.editor.ITextModel | null
+  )
 
   return {
     editor,
@@ -110,6 +124,7 @@ export function createEditorContext(opts: EditorContextOptions): EditorContext {
         throw new Error("Tried to replaceEditorValue while editor wasn't available.")
       }
     },
+    highlight,
     editorValue: { subscribe: editorValue.subscribe }
   }
 }
@@ -119,18 +134,22 @@ export function createEditorContext(opts: EditorContextOptions): EditorContext {
  * @param {AstContextOptions} opts
  * @param opts.code A store containing sourcecode used to
  *   update the AST.
- * @param opts.replaceNode Function to be used when an AST Node component wants 
+ * @param opts.replaceNode Function to be used when an AST Node component wants
  *   to update the editor.
  */
-export function createAstContext({code, replaceNode}: AstContextOptions): AstContext {
-  const sourceFile: Readable<ts.SourceFile | null> = derived(code, ($code) => {
-    if ($code) {
-      console.debug("Converting string to SourceFile")
-      return stringToSourceFile($code)
-    }
+export function createAstContext({ code, replaceNode }: AstContextOptions): AstContext {
+  const sourceFile: Readable<ts.SourceFile | null> = derived(
+    code,
+    ($code) => {
+      if ($code) {
+        console.debug('Converting string to SourceFile')
+        return stringToSourceFile($code)
+      }
 
-    return null
-  }, null)
+      return null
+    },
+    null
+  )
 
   return { sourceFile, replaceNode }
 }

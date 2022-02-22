@@ -4,7 +4,7 @@ module.exports = (ctx) => ({
     sourcesContent: ctx.env === 'development'
   },
   plugins: {
-    autoprefixer: {},
-    tailwindcss: { config: './tailwind.config.cjs' }
+    tailwindcss: { config: './tailwind.config.cjs' },
+    autoprefixer: {}
   }
 })
