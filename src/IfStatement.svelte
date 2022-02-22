@@ -1,14 +1,14 @@
 <script lang="ts">
   import type ts from 'typescript'
-  import { replaceNodeText } from './sourceFileStore'
   import Node from './Node.svelte'
-  /* import { isLabeledStatement } from 'typescript' */
+  import { getContext } from 'svelte'
+  import type { AstContext } from './types'
 
   export let node: ts.IfStatement
   $: expression = node.expression
   $: expressionText = expression.getFullText()
-  $: expressionStart = expression.getStart()
-  $: expressionEnd = expression.getFullWidth()
+
+  let { replaceNode } = getContext('ast') as AstContext
 </script>
 
 <div class="rounded bg-white border-solid border-2 border-blue">
@@ -19,7 +19,7 @@
       <input
         type="text"
         class="mt-1
-							 font-mono
+               font-mono
                block
                w-full
                rounded-md
@@ -28,7 +28,7 @@
                focus:border-gray-500 focus:bg-white focus:ring-0"
         placeholder=""
         value={expressionText}
-        on:input={(e) => replaceNodeText(expression, e.target.value)} />
+        on:input={(e) => replaceNode(expression, e.target.value)} />
     </div>
     {#if node.thenStatement}
       <div class="block">
@@ -37,7 +37,10 @@
       </div>
     {/if}
     {#if node.elseStatement}
-      <Node node={node.elseStatement} />
+      <div class="block">
+        <span class="text-gray-700">else</span>
+        <Node node={node.elseStatement} />
+      </div>
     {/if}
   </div>
 </div>

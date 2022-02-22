@@ -6,6 +6,7 @@
   import SourceFile from './SourceFile.svelte'
   import IfStatement from './IfStatement.svelte'
 
+  import { getNodeRange } from './utils'
   const nodeComponents = { SourceFile, IfStatement }
 
   export let node: ts.Node
@@ -13,6 +14,7 @@
   $: kind = node.kind
   $: nodeType = SyntaxKind[node.kind]
   $: shouldRender = nodeType != 'EndOfFileToken'
+  $: nodeRange = getNodeRange(node)
 
   $: {
     console.log(nodeType, kind, nodeType, shouldRender)
@@ -39,7 +41,7 @@
                  justify-center
                  text-neutral-800
                  hover:bg-slate-300/50">
-          {node.getStart()}:{node.getEnd()}
+          {nodeRange.startLineNumber}:{nodeRange.startColumn}
         </div>
       </div>
 

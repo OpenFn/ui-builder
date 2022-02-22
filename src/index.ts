@@ -1,13 +1,29 @@
-import './main.css'
-// rename to a 'component'.
-import App from './App.svelte'
-import { code } from './sourceFileStore';
+import Layout from './Layout.svelte';
+import { createAstContext, createEditorContext } from './contextManager';
+import { createEditor } from './editorSetup';
+import './main.css';
 
-export function Builder(elem: HTMLElement, initialCode: string): App {
-  if (initialCode) {
-    code.update(() => initialCode);
-  }
+export function Builder(elem: HTMLElement, initialCode: string): Layout {
+  let editorContext = createEditorContext({
+    code: initialCode,
+    editorFactory: createEditor,
+    editorOptions: {
+      language: 'javascript',
+      lineNumbers: 'on',
+      roundedSelection: true,
+      automaticLayout: true,
+      scrollBeyondLastLine: false,
+      readOnly: false,
+      theme: 'vs-dark',
+      minimap: { enabled: false }
+    }
+  })
 
-  const app = new App({ target: elem })
+  let astContext = createAstContext({
+    code: editorContext.editorValue,
+    replaceNode: editorContext.replaceNode
+  })
+
+  const app = new Layout({ target: elem, props: { initialCode, editorContext, astContext } })
   return app
 }

@@ -1,5 +1,7 @@
 import * as ts from 'typescript'
 
+window.ts = ts
+
 /**
  * Generates a nested data structure representing parent and their child nodes
  * for a given node/ast.
@@ -43,3 +45,4 @@ export function printNode(node: ts.Node): string {
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
   return printer.printNode(ts.EmitHint.Unspecified, node, node.getSourceFile())
 }
+
