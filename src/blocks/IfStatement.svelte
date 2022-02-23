@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type ts from 'typescript'
-  import Node from './Node.svelte'
   import { getContext } from 'svelte'
+  import type ts from 'typescript'
   import type { AstContext } from '../types'
+  import Node from './Node.svelte'
 
   export let node: ts.IfStatement
   $: expression = node.expression

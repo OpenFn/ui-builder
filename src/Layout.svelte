@@ -1,10 +1,11 @@
 <script lang="ts">
   import CodeEditor from './CodeEditor.svelte'
   import BlockEditor from './BlockEditor.svelte'
-  import type { AstContext, EditorContext } from './types'
+  import type { AstContext, EditorContext, BlockContext } from './types'
 
   export let editorContext: EditorContext
   export let astContext: AstContext
+  export let blockContext: BlockContext
 </script>
 
 <div class="flex flex-row gap-2">
@@ -14,6 +15,6 @@
   </div>
 
   <div class="basis-1/2 rounded">
-    <BlockEditor {astContext} />
+    <BlockEditor {astContext} {blockContext} />
   </div>
 </div>

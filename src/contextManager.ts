@@ -7,9 +7,9 @@
 import { writable, readable, derived, get, Readable, Writable } from 'svelte/store'
 import type monaco from 'monaco-editor'
 import type ts from 'typescript'
-import type { AstContext, AstContextOptions, EditorContext, EditorContextOptions } from './types'
+import type { AstContext, AstContextOptions, Block, BlockContext, EditorContext, EditorContextOptions, NodeMatchFunction } from './types'
 import { debug } from 'svelte/internal'
-import { stringToSourceFile } from './parser'
+import { getType, stringToSourceFile } from './parser'
 import { replaceNode, replaceEditorValue } from './utils'
 
 interface CodeStore extends Readable<string> {
@@ -122,7 +122,7 @@ export function createEditorContext(opts: EditorContextOptions): EditorContext {
  * @param opts.replaceNode Function to be used when an AST Node component wants 
  *   to update the editor.
  */
-export function createAstContext({code, replaceNode}: AstContextOptions): AstContext {
+export function createAstContext({ code, replaceNode }: AstContextOptions): AstContext {
   const sourceFile: Readable<ts.SourceFile | null> = derived(code, ($code) => {
     if ($code) {
       console.debug("Converting string to SourceFile")
@@ -133,4 +133,42 @@ export function createAstContext({code, replaceNode}: AstContextOptions): AstCon
   }, null)
 
   return { sourceFile, replaceNode }
+}
+
+/**
+ * Create a new BlockContext.
+ * 
+ * Provides facilities to decide which block to render.
+ */
+export function createBlockContext(
+  blocks: Block[],
+  fallback: any,
+  allowFilter: NodeMatchFunction
+): BlockContext {
+  function getBlockForNode(node: ts.Node) {
+    for (const block of blocks) {
+      if (
+        typeof block.matcher === 'string' &&
+        getType(node) === block.matcher
+      ) {
+        return block.component
+      }
+
+      if (typeof block.matcher === 'function' && block.matcher(node)) {
+        return block.component
+      }
+    }
+
+    if (allowFilter(node)) {
+      return fallback
+    }
+    return null
+  }
+
+  return {
+    blocks,
+    getBlockForNode,
+    fallback,
+    allowFilter
+  }
 }

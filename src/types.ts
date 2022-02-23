@@ -1,9 +1,7 @@
+import type monaco from 'monaco-editor'
+import type { SvelteComponent, SvelteComponentDev } from 'svelte/internal'
 import type { Readable } from 'svelte/store'
 import type ts from 'typescript'
-import type monaco from 'monaco-editor'
-interface CodeStore extends Readable<string> {
-  set(this: void, value: string): void
-}
 
 export interface EditorFactory {
   (
@@ -13,47 +11,61 @@ export interface EditorFactory {
 }
 
 export interface EditorContextOptions {
-  code: string;
-  elem?: HTMLElement;
-  editorOptions: monaco.editor.IStandaloneEditorConstructionOptions;
+  code: string
+  elem?: HTMLElement
+  editorOptions: monaco.editor.IStandaloneEditorConstructionOptions
   editorFactory: EditorFactory
 }
 
 export interface EditorContext {
-  editor: Readable<monaco.editor.IStandaloneCodeEditor | null>;
-  elem: Readable<HTMLElement | null>;
+  editor: Readable<monaco.editor.IStandaloneCodeEditor | null>
+  elem: Readable<HTMLElement | null>
   /**
    * Set the element to mount Monaco Editor onto.
-   * @param elem 
+   * @param elem
    */
-  setElem: (elem: HTMLElement) => void;
-  replaceNode: (node: ts.Node, text: string) => void;
-  replaceEditorValue: (text: string) => void;
-  editorValue: Readable<string>;
+  setElem: (elem: HTMLElement) => void
+  replaceNode: (node: ts.Node, text: string) => void
+  replaceEditorValue: (text: string) => void
+  editorValue: Readable<string>
 }
 
 export interface AstContextOptions {
-  code: Readable<string>;
+  code: Readable<string>
   /**
    * Function to replace a given node's text.
-   * 
+   *
    * This will usually be created with the editor model bound inside it.
    * For example `EditorContext.replaceNode` can be passed directly in here.
    */
-  replaceNode: (node: ts.Node, text: string) => void;
+  replaceNode: (node: ts.Node, text: string) => void
 }
 
 export interface AstContext {
   /**
    * Readable store containing the SourceFile object of the main model.
    */
-  sourceFile: Readable<ts.SourceFile | null>;
-  replaceNode: (node: ts.Node, text: string) => void;
+  sourceFile: Readable<ts.SourceFile | null>
+  replaceNode: (node: ts.Node, text: string) => void
 }
 
-
 // Blocks and Resolvers
+export interface NodeMatchFunction {
+  (node: ts.Node): boolean
+}
 
-export interface BlockResolver {
-	(node: ts.Node): boolean;
+export type NodeMatcher = NodeMatchFunction | string
+
+export interface Block {
+  matcher: NodeMatcher
+  component: ConstructorOfATypedSvelteComponent
+}
+
+// TODO: We _shouldn't_ be relying on ConstructorOfATypedSvelteComponent
+// is there something else we can use or an internal type that is compatible?
+export interface BlockContext {
+  blocks: Block[]
+  getBlockForNode: (node: ts.Node) => null | ConstructorOfATypedSvelteComponent
+  fallback: ConstructorOfATypedSvelteComponent
+  allowFilter: NodeMatchFunction
 }

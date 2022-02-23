@@ -1,7 +1,14 @@
-import Layout from './Layout.svelte';
-import { createAstContext, createEditorContext } from './contextManager';
-import { createEditor } from './editorSetup';
-import './main.css';
+import blocks from './blocks'
+import Generic from './blocks/Generic.svelte'
+import {
+  createAstContext,
+  createBlockContext,
+  createEditorContext
+} from './contextManager'
+import { createEditor } from './editorSetup'
+import Layout from './Layout.svelte'
+import './main.css'
+import { getType } from './parser'
 
 export function Builder(elem: HTMLElement, initialCode: string): Layout {
   let editorContext = createEditorContext({
@@ -24,6 +31,14 @@ export function Builder(elem: HTMLElement, initialCode: string): Layout {
     replaceNode: editorContext.replaceNode
   })
 
-  const app = new Layout({ target: elem, props: { initialCode, editorContext, astContext } })
+  let blockContext = createBlockContext(blocks, Generic, (node) => {
+    return getType(node) !== 'EndOfFileToken'
+  })
+
+  const app = new Layout({
+    target: elem,
+    props: { editorContext, astContext, blockContext }
+  })
+
   return app
 }

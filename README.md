@@ -19,15 +19,16 @@ module and call it with the mounting element and optionally some initial code.
 ```html
 <div id="editor" style="max-height: 80vh"></div>
 <script>
-  import('/assets/ui-builder.js')
-    .then(({Builder}) => {
-      Builder(document.getElementById("editor"),
+  import('/assets/ui-builder.js').then(({ Builder }) => {
+    Builder(
+      document.getElementById('editor'),
       `if (true) {
         alert('foo')
        } else {
         throw new Error("bar")
        }`
-    )});
+    )
+  })
 </script>
 ```
 
@@ -35,7 +36,7 @@ module and call it with the mounting element and optionally some initial code.
 
 > ⛔ _This is internal currently_
 
-In the [`Editor`](src/Editor.svelte) component, .d.ts files can be added to the 
+In the [`Editor`](src/Editor.svelte) component, .d.ts files can be added to the
 editor directly using the `addExtraLib` from `editorSetup`.
 
 The type definitions will not be available in the Block Builder pane when done
@@ -44,8 +45,46 @@ this way.
 > **NOTE** In order to emulate globally available functions (like with OpenFn
 > jobs), the `.d.ts` must not have any exports on the functions.  
 > A strategy for either flattening type definitions or working with a module
-> that has multiple type definition files (despite only one used entrypoint) 
+> that has multiple type definition files (despite only one used entrypoint)
 > hasn't been considered yet.
+
+## Blocks
+
+Blocks are UI components that represent AST nodes and can manipulate the editor
+code.
+
+Each block has a matcher and a component.
+
+### Matchers
+
+In order to determine if a given Node in a tree should be rendered with a Block
+it's matcher is called - if the function returns something truthy then it will
+rendered.
+
+Blocks are considered on a 'first-wins' basis, that being in the list of possible
+candidates, the first one wins.
+
+> **NOTE** This may not be desirable in the future as ordering components may
+> become tricky as many components will share the same NodeType like `CallExpression`.
+
+### Rendering
+
+The `Node` component is the parent of all rendered Blocks, it serves as the 
+switch between rendering a custom component, a default one.
+
+It starts with a Node from the AST, and using the BlockContext 
+(registered by it's parent BlockEditor), it resolves which Block to render 
+for the node.
+
+In many situations there are nodes that we don't want to render 
+(like EndOfFileToken) and also many nodes we want to render but don't 
+have a component for.
+
+With a combination of a fallback component and an `allowFilter` we can control 
+which nodes we want to render.
+
+The render cycle is generally recursive, a child node which we want to render 
+but don't need to specify how can be passed to the Node component.
 
 ## Deployment
 
@@ -119,11 +158,11 @@ Deploy the directory `public/`
 - Show type errors and warnings on the UI component.
 - Allow extending the list of node rendering components.
 - Using diagnostic information (`ts.d` or perhaps JSDoc) to inform specific
-component choices.
+  component choices.
   (Special components for libraries).
 - Provide examples of complex node components. (think wrapping a node in a `try/catch`)
   Work out how to delay choosing a component, in the example of wrapping a block
-	can we delay detecting the block while it's inside a different parent?
+  can we delay detecting the block while it's inside a different parent?
 - Drag and drop reording of statements.
 
 ### Further Goals
