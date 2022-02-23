@@ -1,3 +1,11 @@
+<script context="module" lang="ts">
+	import * as ts from 'typescript'
+
+	export function resolver(node: ts.Node) {
+		return ts.isIfStatement(node)
+	}
+</script>
+
 <script lang="ts">
   import type ts from 'typescript'
   import Node from './Node.svelte'

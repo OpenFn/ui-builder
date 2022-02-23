@@ -47,6 +47,25 @@ this way.
 > that has multiple type definition files (despite only one used entrypoint) 
 > hasn't been considered yet.
 
+## Blocks
+
+Blocks are UI components that represent AST nodes and can manipulate the editor
+code.
+
+Each block has a resolver and a components.
+
+### Resolvers
+
+In order to determine if a given Node in a tree should be rendered with a Block
+it's resolver is called - if the function returns something truthy then it will 
+rendered.
+
+Blocks are considered on a 'first-wins' basis, that being in the list of possible
+candidates, the first one wins.
+
+> **NOTE** This may not be desirable in the future as ordering components may
+> become tricky as many components will share the same NodeType like `CallExpression`.
+
 ## Deployment
 
 Deploying libraries that use WebWorkers can be difficult, however when using
