@@ -1,5 +1,5 @@
 <script>
-  import { getChildren } from './parser'
+  import { getChildren } from '../parser'
   import Node from './Node.svelte'
 
   export let node

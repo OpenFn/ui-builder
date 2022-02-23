@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setContext } from 'svelte'
   import type { AstContext } from './types'
-  import Node from './Node.svelte'
+  import Node from './blocks/Node.svelte'
 
   export let astContext: AstContext
 

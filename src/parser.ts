@@ -1,24 +1,22 @@
 import * as ts from 'typescript'
 
-window.ts = ts
-
 /**
  * Generates a nested data structure representing parent and their child nodes
  * for a given node/ast.
  *
  * `[Kind, [Child, ...]]`
  */
-export function generateTree(node: ts.Node, acc: string[][] = []) {
-  const parent: string = ts.SyntaxKind[node.kind]
-  const children: string[][] = []
+// export function generateTree(node: ts.Node, acc: string[][] = []) {
+//   const parent: string = ts.SyntaxKind[node.kind]
+//   const children: string[][] = []
 
-  ts.forEachChild(node, (node: ts.Node) => {
-    generateTree(node, children)
-  })
-  acc.push([parent, children])
+//   ts.forEachChild(node, (node: ts.Node) => {
+//     generateTree(node, children)
+//   })
+//   acc.push([parent, children])
 
-  return acc
-}
+//   return acc
+// }
 
 export function stringToSourceFile(code: string): ts.SourceFile {
   // ES2020 being the script target
