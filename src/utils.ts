@@ -31,7 +31,7 @@ export function getNodeRange(node: ts.Node): IRange {
 /**
  * Replaces a section of the editor code using an AST node's postion.
  * The Node passed in should come from an AST that came from the same model code.
- * 
+ *
  * This is the preferred way of changing the editor code as it maintains the
  * undo/redo stack.
  */
@@ -58,3 +58,4 @@ export function replaceEditorValue(editor: editor.IStandaloneCodeEditor, value: 
     editor.pushUndoStop()
   }
 }
+

@@ -50,3 +50,10 @@ export interface AstContext {
   sourceFile: Readable<ts.SourceFile | null>;
   replaceNode: (node: ts.Node, text: string) => void;
 }
+
+
+// Blocks and Resolvers
+
+export interface BlockResolver {
+	(node: ts.Node): boolean;
+}

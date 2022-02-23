@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { getChildren, getType } from './parser'
+  import { getChildren, getType } from '../parser'
   import { SyntaxKind } from 'typescript'
   import type ts from 'typescript'
 
   import SourceFile from './SourceFile.svelte'
   import IfStatement from './IfStatement.svelte'
 
-  import { getNodeRange } from './utils'
+  import { getNodeRange } from '../utils'
   const nodeComponents = { SourceFile, IfStatement }
 
   export let node: ts.Node
@@ -46,8 +46,8 @@
       </div>
 
       <div class="flex flex-col rounded px-2 pb-2 space-y-2">
-        {#each [...getChildren(node)] as node}
-          <svelte:self {node} />
+        {#each [...getChildren(node)] as _node}
+          <svelte:self node={_node} />
         {/each}
       </div>
     </div>
