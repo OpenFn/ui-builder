@@ -25,20 +25,14 @@ export interface EditorContext {
    * @param elem
    */
   setElem: (elem: HTMLElement) => void
-  replaceNode: (node: ts.Node, text: string) => void
   replaceEditorValue: (text: string) => void
   editorValue: Readable<string>
+  model: Readable<monaco.editor.ITextModel | null>
 }
 
 export interface AstContextOptions {
   code: Readable<string>
-  /**
-   * Function to replace a given node's text.
-   *
-   * This will usually be created with the editor model bound inside it.
-   * For example `EditorContext.replaceNode` can be passed directly in here.
-   */
-  replaceNode: (node: ts.Node, text: string) => void
+  model: Readable<monaco.editor.ITextModel | null>
 }
 
 export interface AstContext {
@@ -46,7 +40,15 @@ export interface AstContext {
    * Readable store containing the SourceFile object of the main model.
    */
   sourceFile: Readable<ts.SourceFile | null>
-  replaceNode: (node: ts.Node, text: string) => void
+  /**
+   * Function to replace a given node's text.
+   *
+   * This will usually be created with the editor model bound inside it.
+   * For example `EditorContext.replaceNode` can be passed directly in here.
+   */
+  replaceNode: (node: ts.Node, text: string | ts.Node) => void
+  insertAfterNode: (node: ts.Node, text: string | ts.Node) => void
+  textFactory: (builder: (factory: ts.NodeFactory) => ts.Node) => string
 }
 
 // Blocks and Resolvers

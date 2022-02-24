@@ -4,13 +4,34 @@
  * Singleton store for communicating between the code and block editors
  */
 
-import { writable, readable, derived, get, Readable, Writable } from 'svelte/store'
+import {
+  writable,
+  readable,
+  derived,
+  get,
+  Readable,
+  Writable
+} from 'svelte/store'
 import type monaco from 'monaco-editor'
 import type ts from 'typescript'
-import type { AstContext, AstContextOptions, Block, BlockContext, EditorContext, EditorContextOptions, NodeMatchFunction } from './types'
+import type {
+  AstContext,
+  AstContextOptions,
+  Block,
+  BlockContext,
+  EditorContext,
+  EditorContextOptions,
+  NodeMatchFunction
+} from './types'
 import { debug } from 'svelte/internal'
 import { getType, stringToSourceFile } from './parser'
-import { replaceNode, replaceEditorValue } from './utils'
+import {
+  replaceNode,
+  replaceEditorValue,
+  insertAfterNode,
+  textFactory,
+  printNode
+} from './utils'
 
 interface CodeStore extends Readable<string> {
   set(this: void, value: string): void
@@ -56,58 +77,62 @@ export function createContext(options: ContextOptions) {
  */
 export function createEditorContext(opts: EditorContextOptions): EditorContext {
   const editor = writable<monaco.editor.IStandaloneCodeEditor | null>(null)
-  const editorValue: Writable<string> = writable("");
-  const elem: Writable<HTMLElement | null> = writable(opts.elem || null);
+  const editorValue: Writable<string> = writable('')
+  const elem: Writable<HTMLElement | null> = writable(opts.elem || null)
 
   function setElem(newElem: HTMLElement) {
-    console.debug("setting EditorContext.elem as", newElem)
+    console.debug('setting EditorContext.elem as', newElem)
     elem.set(newElem)
   }
 
   elem.subscribe(($elem) => {
     if ($elem) {
-      const _editor = opts.editorFactory($elem, { ...opts.editorOptions, value: opts.code })
+      const _editor = opts.editorFactory($elem, {
+        ...opts.editorOptions,
+        value: opts.code
+      })
 
-      console.debug("setting onDidChangeModelContent callback")
+      console.debug('setting onDidChangeModelContent callback')
       _editor.onDidChangeModelContent((event) => {
-        console.debug("setting editorContent from onDidChangeModelContent")
+        console.debug('setting editorContent from onDidChangeModelContent')
         editorValue.set(_editor.getValue())
       })
 
       // Instead of waiting for a change in the editor, we set it immediately.
-      console.debug("setting EditorContext.editorValue with initial value from editor")
+      console.debug(
+        'setting EditorContext.editorValue with initial value from editor'
+      )
       editorValue.set(_editor.getValue())
       editor.set(_editor)
     }
   })
 
-  const model = derived(editor, ($editor) => {
-    if ($editor) {
-      console.debug("setting editorContent from derived model")
-      editorValue.set($editor.getValue())
-      return $editor.getModel()
-    }
-    return null
-  }, null as monaco.editor.ITextModel | null)
+  const model = derived(
+    editor,
+    ($editor) => {
+      if ($editor) {
+        console.debug('setting editorContent from derived model')
+        editorValue.set($editor.getValue())
+        return $editor.getModel()
+      }
+      return null
+    },
+    null as monaco.editor.ITextModel | null
+  )
 
   return {
     editor,
     elem,
     setElem,
-    replaceNode: (node: ts.Node, text: string) => {
-      const _model = get(model)
-      if (_model) {
-        replaceNode(_model, node, text)
-      } else {
-        throw new Error("Tried to replaceNode while model wasn't available.")
-      }
-    },
+    model,
     replaceEditorValue: (text: string) => {
       const _editor = get(editor)
       if (_editor) {
         replaceEditorValue(_editor, text)
       } else {
-        throw new Error("Tried to replaceEditorValue while editor wasn't available.")
+        throw new Error(
+          "Tried to replaceEditorValue while editor wasn't available."
+        )
       }
     },
     editorValue: { subscribe: editorValue.subscribe }
@@ -119,25 +144,69 @@ export function createEditorContext(opts: EditorContextOptions): EditorContext {
  * @param {AstContextOptions} opts
  * @param opts.code A store containing sourcecode used to
  *   update the AST.
- * @param opts.replaceNode Function to be used when an AST Node component wants 
+ * @param opts.replaceNode Function to be used when an AST Node component wants
  *   to update the editor.
  */
-export function createAstContext({ code, replaceNode }: AstContextOptions): AstContext {
-  const sourceFile: Readable<ts.SourceFile | null> = derived(code, ($code) => {
-    if ($code) {
-      console.debug("Converting string to SourceFile")
-      return stringToSourceFile($code)
+export function createAstContext({
+  code,
+  model
+}: AstContextOptions): AstContext {
+  const sourceFile: Readable<ts.SourceFile | null> = derived(
+    code,
+    ($code) => {
+      if ($code) {
+        console.debug('Converting string to SourceFile')
+        return stringToSourceFile($code)
+      }
+
+      return null
+    },
+    null
+  )
+
+  function getModel() {
+    const _model = get(model)
+    if (_model) {
+      return _model
+    } else {
+      throw new Error("Tried to access model while it wasn't available")
+    }
+  }
+
+  function getSourceFile() {
+    const _sourceFile = get(sourceFile)
+    if (_sourceFile) {
+      return _sourceFile
+    } else {
+      throw new Error("Tried to access sourceFile while it wasn't available")
+    }
+  }
+
+  function ensureNodeIsString(textOrNode: string | ts.Node) {
+    if (typeof textOrNode === 'string') {
+      return textOrNode
     }
 
-    return null
-  }, null)
+    return printNode(getSourceFile())
+  }
 
-  return { sourceFile, replaceNode }
+  return {
+    sourceFile,
+    replaceNode: (node, textOrNode) => {
+      replaceNode(getModel(), node, ensureNodeIsString(textOrNode))
+    },
+    insertAfterNode: (node, textOrNode) => {
+      insertAfterNode(getModel(), node, ensureNodeIsString(textOrNode))
+    },
+    textFactory: (builder) => {
+      return textFactory(getSourceFile(), builder)
+    }
+  }
 }
 
 /**
  * Create a new BlockContext.
- * 
+ *
  * Provides facilities to decide which block to render.
  */
 export function createBlockContext(

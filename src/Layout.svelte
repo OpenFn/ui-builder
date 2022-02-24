@@ -16,5 +16,6 @@
 
   <div class="basis-1/2 rounded">
     <BlockEditor {astContext} {blockContext} />
+
   </div>
 </div>

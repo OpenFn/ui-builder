@@ -28,7 +28,7 @@ export function Builder(elem: HTMLElement, initialCode: string): Layout {
 
   let astContext = createAstContext({
     code: editorContext.editorValue,
-    replaceNode: editorContext.replaceNode
+    model: editorContext.model
   })
 
   let blockContext = createBlockContext(blocks, Generic, (node) => {

@@ -5,7 +5,13 @@
  * should be library/use case agnostic.
  */
 
-import { getLineAndCharacterOfPosition } from 'typescript'
+import {
+  getLineAndCharacterOfPosition,
+  factory,
+  EmitHint,
+  NewLineKind,
+  createPrinter
+} from 'typescript'
 import type ts from 'typescript'
 import type { IRange, editor } from 'monaco-editor'
 
@@ -17,12 +23,26 @@ import type { IRange, editor } from 'monaco-editor'
  * are ignored.
  */
 export function getNodeRange(node: ts.Node): IRange {
-  const start = getLineAndCharacterOfPosition(node.getSourceFile(), node.getStart())
+  const start = getLineAndCharacterOfPosition(
+    node.getSourceFile(),
+    node.getStart()
+  )
   const end = getLineAndCharacterOfPosition(node.getSourceFile(), node.getEnd())
 
   return {
     startLineNumber: start.line + 1,
     startColumn: start.character + 1,
+    endLineNumber: end.line + 1,
+    endColumn: end.character + 1
+  }
+}
+
+export function getEndRange(node: ts.Node): IRange {
+  const end = getLineAndCharacterOfPosition(node.getSourceFile(), node.getEnd())
+
+  return {
+    startLineNumber: end.line + 1,
+    startColumn: end.character + 1,
     endLineNumber: end.line + 1,
     endColumn: end.character + 1
   }
@@ -35,12 +55,28 @@ export function getNodeRange(node: ts.Node): IRange {
  * This is the preferred way of changing the editor code as it maintains the
  * undo/redo stack.
  */
-export function replaceNode(model: editor.ITextModel, node: ts.Node, text: string): void {
+export function replaceNode(
+  model: editor.ITextModel,
+  node: ts.Node,
+  text: string
+): void {
   // @ts-expect-error
   model.pushEditOperations([], [{ range: getNodeRange(node), text }])
 }
 
-export function replaceEditorValue(editor: editor.IStandaloneCodeEditor, value: string) {
+export function insertAfterNode(
+  model: editor.ITextModel,
+  node: ts.Node,
+  text: string
+): void {
+  // @ts-expect-error
+  model.pushEditOperations([], [{ range: getEndRange(node), text }])
+}
+
+export function replaceEditorValue(
+  editor: editor.IStandaloneCodeEditor,
+  value: string
+) {
   const model = editor.getModel()
   if (value != null && model != null && value !== model.getValue()) {
     editor.pushUndoStop()
@@ -59,3 +95,18 @@ export function replaceEditorValue(editor: editor.IStandaloneCodeEditor, value: 
   }
 }
 
+export function printNode(sourceFile: ts.SourceFile, node: ts.Node): string {
+  return createPrinter({ newLine: NewLineKind.LineFeed }).printNode(
+    EmitHint.Unspecified,
+    node,
+    sourceFile
+  )
+}
+
+export function textFactory(
+  sourceFile: ts.SourceFile,
+  builder: (factory: ts.NodeFactory) => ts.Node
+): string {
+  const node = builder(factory)
+  return printNode(sourceFile, node)
+}
