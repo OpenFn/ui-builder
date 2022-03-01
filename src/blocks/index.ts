@@ -1,7 +1,9 @@
 import * as ts from 'typescript'
+import { getCallExpression } from '../utils'
 import ForLoop from './ForLoop.svelte'
 import IfStatement from './IfStatement.svelte'
 import SourceFile from './SourceFile.svelte'
+import CallExpression from './CallExpression.svelte'
 export { default as Generic } from './Generic.svelte'
 export { default as Node } from './Node.svelte'
 
@@ -22,5 +24,10 @@ export default [
   {
     component: ForLoop,
     matcher: ts.isForStatement
+  },
+  {
+    component: CallExpression,
+    matcher: (n: ts.Node) => Boolean(getCallExpression(n))
   }
 ]
+

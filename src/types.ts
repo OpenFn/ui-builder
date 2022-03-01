@@ -2,6 +2,7 @@ import type monaco from 'monaco-editor'
 import type { SvelteComponent, SvelteComponentDev } from 'svelte/internal'
 import type { Readable } from 'svelte/store'
 import type ts from 'typescript'
+import type {BaseCompiler} from './compiler'
 
 export interface EditorFactory {
   (
@@ -40,6 +41,8 @@ export interface AstContext {
    * Readable store containing the SourceFile object of the main model.
    */
   sourceFile: Readable<ts.SourceFile | null>
+  // compiler: Readable<BaseCompiler | null>
+  getSymbolAtLocation: (node: ts.Node) => ts.Symbol | undefined
   /**
    * Function to replace a given node's text.
    *

@@ -3,12 +3,17 @@
   import type ts from 'typescript'
   import type { AstContext } from '../types'
   export let node: ts.StringLiteralLike
+  export let name: string
+  export let optional: boolean = true
 
   let { replaceString } = getContext('ast') as AstContext
 </script>
 
 <div class="block">
-  <span class="text-gray-700">url</span>
+  <span class="text-gray-700">{name}</span>
+  {#if optional}
+    <span class="text-gray-700 align-super text-xs">optional</span>
+  {/if}
   <input
     type="text"
     class="mt-1

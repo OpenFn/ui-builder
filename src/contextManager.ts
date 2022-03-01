@@ -6,7 +6,6 @@
 
 import {
   writable,
-  readable,
   derived,
   get,
   Readable,
@@ -23,7 +22,6 @@ import type {
   EditorContextOptions,
   NodeMatchFunction
 } from './types'
-import { debug } from 'svelte/internal'
 import { getType, stringToSourceFile } from './parser'
 import {
   replaceNode,
@@ -32,6 +30,7 @@ import {
   textFactory,
   printNode
 } from './utils'
+import {assembleCompiler, BaseCompiler} from './compiler'
 
 interface CodeStore extends Readable<string> {
   set(this: void, value: string): void
@@ -151,12 +150,26 @@ export function createAstContext({
   code,
   model
 }: AstContextOptions): AstContext {
-  const sourceFile: Readable<ts.SourceFile | null> = derived(
+  const compiler: Readable<BaseCompiler | null> = derived(
     code,
-    ($code) => {
+    async ($code, set) => {
       if ($code) {
-        console.debug('Converting string to SourceFile')
-        return stringToSourceFile($code)
+        console.debug('Code changed, assembling compiler')
+        const _compiler = await assembleCompiler($code)
+        window.compiler = _compiler
+        return set(_compiler)
+      }
+
+      return null
+    }
+  )
+
+  const sourceFile: Readable<ts.SourceFile | null> = derived(
+    compiler,
+    ($compiler) => {
+      if ($compiler) {
+        console.debug('Getting SourceFile from compiler')
+        return $compiler.sourceFile
       }
 
       return null
@@ -182,6 +195,15 @@ export function createAstContext({
     }
   }
 
+  function getCompiler() {
+    const _compiler = get(compiler)
+    if (_compiler) {
+      return _compiler
+    } else {
+      throw new Error("Tried to access compiler while it wasn't available")
+    }
+  }
+
   function ensureNodeIsString(textOrNode: string | ts.Node) {
     if (typeof textOrNode === 'string') {
       return textOrNode
@@ -204,6 +226,9 @@ export function createAstContext({
     },
     textFactory: (builder) => {
       return textFactory(getSourceFile(), builder)
+    },
+    getSymbolAtLocation: (node: ts.Node) => {
+      return getCompiler().program.getTypeChecker().getSymbolAtLocation(node)
     }
   }
 }
