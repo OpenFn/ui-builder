@@ -14,6 +14,7 @@ import {
 } from 'typescript'
 import type ts from 'typescript'
 import type { IRange, editor } from 'monaco-editor'
+import { getType } from './parser'
 
 /**
  * Gets an IRange of a given Node, which can be used when sending edit operations
@@ -109,4 +110,21 @@ export function textFactory(
 ): string {
   const node = builder(factory)
   return printNode(sourceFile, node)
+}
+
+/**
+ * Recursively attempts to find a `CallExpression` inside a node.
+ * CallExpressions can be found inside many different kinds of nodes, this 
+ * recursively attempts to find the first `CallExpression` in a set of known 
+ * Node types.
+ */
+export function getCallExpression(node: ts.Node): null | ts.CallExpression {
+  switch (getType(node)) {
+    case 'CallExpression':
+      return node as ts.CallExpression
+    case 'ExpressionStatement':
+      return getCallExpression((node as ts.ExpressionStatement).expression)
+    default:
+      return null
+  }
 }
