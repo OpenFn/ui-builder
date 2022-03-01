@@ -11,5 +11,7 @@
 </script>
 
 {#if component}
-  <svelte:component this={component} {node} />
+  <div class="my-2">
+    <svelte:component this={component} {node} />
+  </div>
 {/if}
