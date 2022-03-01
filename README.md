@@ -69,22 +69,53 @@ candidates, the first one wins.
 
 ### Rendering
 
-The `Node` component is the parent of all rendered Blocks, it serves as the 
+The `Node` component is the parent of all rendered Blocks, it serves as the
 switch between rendering a custom component, a default one.
 
-It starts with a Node from the AST, and using the BlockContext 
-(registered by it's parent BlockEditor), it resolves which Block to render 
+It starts with a Node from the AST, and using the BlockContext
+(registered by it's parent BlockEditor), it resolves which Block to render
 for the node.
 
-In many situations there are nodes that we don't want to render 
-(like EndOfFileToken) and also many nodes we want to render but don't 
+In many situations there are nodes that we don't want to render
+(like EndOfFileToken) and also many nodes we want to render but don't
 have a component for.
 
-With a combination of a fallback component and an `allowFilter` we can control 
+With a combination of a fallback component and an `allowFilter` we can control
 which nodes we want to render.
 
-The render cycle is generally recursive, a child node which we want to render 
+The render cycle is generally recursive, a child node which we want to render
 but don't need to specify how can be passed to the Node component.
+
+### Adding Custom Blocks
+
+When you need something with more functionality than the built-in blocks, you
+can extend the list of blocks in `BlockContext`.
+
+This requires creating your own context that is used by the renderer to select
+and mount the blocks.
+
+```javascript
+const blocks = [
+  ...builtinBlocks,
+  {
+    component: MyCustomComponent,
+    matcher: (node) => {
+      if (ts.isExpressionStatement(node)) {
+        return true
+      }
+      return false
+    }
+  }
+]
+
+createBlockContext(blocks, fallbackComponent, allowFilter)
+```
+
+> ⛔ _This is internal currently_  
+> It expects you to provide any AST node matching functions
+> (e.g. `isCallExpression` from Typescript). Along with that requirement all the
+> dependencies for `Layout` are required to be constructed directly
+> (see [`src/index.ts`](src/index.ts) entrypoint for an example.
 
 ## Deployment
 

@@ -47,6 +47,7 @@ export interface AstContext {
    * For example `EditorContext.replaceNode` can be passed directly in here.
    */
   replaceNode: (node: ts.Node, text: string | ts.Node) => void
+  replaceString: (node: ts.StringLiteralLike, text: string) => void
   insertAfterNode: (node: ts.Node, text: string | ts.Node) => void
   textFactory: (builder: (factory: ts.NodeFactory) => ts.Node) => string
 }

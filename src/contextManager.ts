@@ -195,6 +195,10 @@ export function createAstContext({
     replaceNode: (node, textOrNode) => {
       replaceNode(getModel(), node, ensureNodeIsString(textOrNode))
     },
+    replaceString: (node, text) => {
+      const delimeter = node.getFullText()[0];
+      replaceNode(getModel(), node, `${delimeter}${text}${delimeter}`)
+    },
     insertAfterNode: (node, textOrNode) => {
       insertAfterNode(getModel(), node, ensureNodeIsString(textOrNode))
     },
