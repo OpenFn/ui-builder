@@ -187,7 +187,7 @@ export function createAstContext({
       return textOrNode
     }
 
-    return printNode(getSourceFile())
+    return printNode(getSourceFile(), textOrNode)
   }
 
   return {
@@ -196,7 +196,7 @@ export function createAstContext({
       replaceNode(getModel(), node, ensureNodeIsString(textOrNode))
     },
     replaceString: (node, text) => {
-      const delimeter = node.getFullText()[0];
+      const delimeter = node.getFullText()[0]
       replaceNode(getModel(), node, `${delimeter}${text}${delimeter}`)
     },
     insertAfterNode: (node, textOrNode) => {
